@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration HOME COIFFURE CI</title>
+
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#f5f5f5;
+margin:0;
+padding:20px;
+}
+
+h1{
+text-align:center;
+color:#ff0080;
+}
+
+.stats{
+display:flex;
+gap:15px;
+flex-wrap:wrap;
+margin-bottom:20px;
+}
+
+.box{
+flex:1;
+min-width:220px;
+background:white;
+padding:20px;
+border-radius:10px;
+text-align:center;
+box-shadow:0 2px 8px rgba(0,0,0,.2);
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:white;
+}
+
+th{
+background:#ff0080;
+color:white;
+padding:10px;
+}
+
+td{
+padding:10px;
+border-bottom:1px solid #ddd;
+}
+
+.confirmer{
+background:green;
+color:white;
+border:none;
+padding:8px;
+border-radius:5px;
+cursor:pointer;
+}
+
+.supprimer{
+background:red;
+color:white;
+border:none;
+padding:8px;
+border-radius:5px;
+cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Administration HOME COIFFURE CI</h1>
+
+<div class="stats">
+<div class="box">
+<h2 id="total">0</h2>
+<p>Total réservations</p>
+</div>
+
+<div class="box">
+<h2 id="attente">0</h2>
+<p>En attente</p>
+</div>
+
+<div class="box">
+<h2 id="confirmees">0</h2>
+<p>Confirmées</p>
+</div>
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Nom</th>
+<th>Téléphone</th><th>Prestation</th>
+<th>Date</th>
+<th>Heure</th>
+<th>Paiement</th>
+<th>Adresse</th>
+<th>Statut</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="listeReservations"></tbody>
+</table>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+getDocs,
+deleteDoc,
+doc,
+updateDoc
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+import {
+getAuth,
+signInWithEmailAndPassword,
+onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+
+apiKey:"AIzaSyD0mZKfPFFscc1JYobyrBu4sVuwXmci79w",
+
+authDomain:"home-coiffure-ci.firebaseapp.com",
+
+projectId:"home-coiffure-ci",
+
+storageBucket:"home-coiffure-ci.firebasestorage.app",
+
+messagingSenderId:"674027032595",
+
+appId:"1:674027032595:web:909aba21b8d0d16882fe6"
+
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+const tbody=document.getElementById("listeReservations");
+
+async function chargerReservations(){
+
+tbody.innerHTML="";
+
+let total=0;
+let attente=0;
+let confirmees=0;
+
+const snapshot=await getDocs(collection(db,"reservations"));
+
+snapshot.forEach((documento)=>{
+
+const data=documento.data();
+
+total++;
+
+if(data.statut==="Confirmée"){
+confirmees++;
+}else{
+attente++;
+}
+
+tbody.innerHTML+=`
+<tr>
+<td>${data.nom||""}</td>
+<td>${data.telephone||""}</td><td>${data.prestation||""}</td>
+<td>${data.date||""}</td>
+<td>${data.heure||""}</td>
+<td>${data.paiement||""}</td>
+<td>${data.adresse||""}</td>
+<td>${data.statut||"En attente"}</td>
+<td>
+<button class="confirmer"
+onclick="confirmerReservation('${documento.id}')">
+Confirmer
+</button>
+
+<button class="supprimer"
+onclick="supprimerReservation('${documento.id}')">
+Supprimer
+</button>
+</td>
+</tr>
+`;
+});
+
+document.getElementById("total").innerText=total;
+document.getElementById("attente").innerText=attente;
+document.getElementById("confirmees").innerText=confirmees;
+}
+
+window.confirmerReservation=async function(id){
+
+await updateDoc(doc(db,"reservations",id),{
+statut:"Confirmée"
+});
+
+chargerReservations();
+}
+
+window.supprimerReservation=async function(id){
+
+if(confirm("Supprimer cette réservation ?")){
+
+await deleteDoc(doc(db,"reservations",id));
+
+chargerReservations();
+}
+}
+
+onAuthStateChanged(auth,(user)=>{
+
+if(user){
+
+chargerReservations();
+
+}else{
+
+const email=prompt("Email administrateur");
+const password=prompt("Mot de passe");
+
+signInWithEmailAndPassword(auth,email,password)
+
+.catch(()=>{
+
+alert("Accès refusé");
+
+window.location.href="index.html";
+
+});
+
+}
+
+});
+
+</script>
+
+</body>
+</html>

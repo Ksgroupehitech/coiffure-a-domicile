@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>HOME COIFFURE CI</title>
+
+<style>
+body{
+font-family:Arial,sans-serif;
+margin:0;
+background:#f5f5f5;
+}
+
+header{
+background:linear-gradient(135deg,#00c6ff,#ff00aa);
+color:white;
+text-align:center;
+padding:30px;
+}
+
+.logo{
+width:120px;
+border-radius:15px;
+}
+
+h1{
+margin:10px 0;
+}
+
+.catalogue{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+padding:20px;
+}
+
+.carte{
+background:white;
+border-radius:10px;
+overflow:hidden;
+box-shadow:0 2px 8px rgba(0,0,0,0.2);
+}
+
+.carte img{
+width:100%;
+height:220px;
+object-fit:cover;
+}
+
+.carte h3{
+padding:10px;
+margin:0;
+}
+
+.prix{
+color:#ff0080;
+font-size:22px;
+font-weight:bold;
+padding:0 10px 15px;
+}
+
+.reservation{
+background:white;
+max-width:800px;
+margin:30px auto;
+padding:20px;
+border-radius:15px;
+box-shadow:0 2px 10px rgba(0,0,0,0.2);
+}
+
+input,textarea,select{
+width:100%;
+padding:12px;
+margin:10px 0;
+border:1px solid #ccc;
+border-radius:8px;
+box-sizing:border-box;
+}
+
+button{
+width:100%;
+padding:15px;
+background:#ff00aa;
+color:white;
+border:none;
+border-radius:8px;
+font-size:18px;
+cursor:pointer;
+}
+
+button:hover{
+opacity:0.9;
+}
+
+footer{
+background:linear-gradient(135deg,#00c6ff,#0066ff);
+color:white;
+text-align:center;
+padding:20px;
+margin-top:30px;
+}
+</style>
+
+</head>
+<body>
+
+<header>
+
+<img src="logo.png" class="logo">
+
+<h1>HOME COIFFURE CI</h1>
+
+<p>Votre salon de coiffure vient à vous</p>
+
+</header>
+
+<section class="catalogue">
+
+<div class="carte">
+<img src="coupe-homme.jpg">
+<h3>Coupe Homme</h3>
+<div class="prix">3 000 FCFA</div>
+</div>
+
+<div class="carte">
+<img src="tresses.jpg">
+<h3>Tresses Africaines</h3>
+<div class="prix">10 000 FCFA</div>
+</div>
+
+<div class="carte">
+<img src="locks.jpg">
+<h3>Locks</h3>
+<div class="prix">15 000 FCFA</div>
+</div>
+
+<div class="carte">
+<img src="perruque.jpg">
+<h3>Perruque</h3>
+<div class="prix">20 000 FCFA</div>
+</div>
+
+<div class="carte">
+<img src="lissage.jpg">
+<h3>Lissage</h3>
+<div class="prix">12 000 FCFA</div>
+</div>
+
+<div class="carte">
+<img src="coloration.jpg">
+<h3>Coloration</h3>
+<div class="prix">8 000 FCFA</div>
+</div>
+
+</section>
+
+<section class="reservation">
+
+<h2>Réservation</h2>
+
+<input type="text" id="nom" placeholder="Nom complet">
+
+<input type="tel" id="telephone" placeholder="Téléphone">
+
+<input type="date" id="date">
+
+<input type="time" id="heure">
+
+<textarea id="adresse" placeholder="Adresse complète"></textarea>
+
+<select id="prestation">
+<option>Coupe Homme</option>
+<option>Tresses Africaines</option>
+<option>Locks</option>
+<option>Perruque</option>
+<option>Lissage</option>
+<option>Coloration</option>
+</select>
+
+<select id="paiement">
+<option>Paiement sur place</option>
+<option>Mobile Money</option>
+</select>
+
+<button type="button" onclick="enregistrerReservation()">
+Confirmer la réservation
+</button>
+
+</section>
+
+<footer>
+
+<h3>HOME COIFFURE CI</h3>
+
+📞 WhatsApp : 07 77 40 59 94<br><br>Wave : 07 89 96 52 24<br>MTN Money : 05 45 03 29 48<br>Orange Money : 07 78 59 79 85
+
+<br><br>
+
+Choisissez votre coiffure, restez chez vous.
+
+</footer>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyD0mZKfPFFscc1JYobyrBu4sVuwXmci79w",
+authDomain: "home-coiffure-ci.firebaseapp.com",
+projectId: "home-coiffure-ci",
+storageBucket: "home-coiffure-ci.firebasestorage.app",
+messagingSenderId: "674027032595",
+appId: "1:674027032595:web:909aba21b8d0d16882fe6"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.enregistrerReservation = async function(){
+
+const nom=document.getElementById("nom").value;
+const telephone=document.getElementById("telephone").value;
+const date=document.getElementById("date").value;
+const heure=document.getElementById("heure").value;
+const adresse=document.getElementById("adresse").value;
+const prestation=document.getElementById("prestation").value;
+const paiement=document.getElementById("paiement").value;
+
+if(!nom || !telephone || !date || !heure || !adresse){
+alert("Veuillez remplir tous les champs");
+return;
+}
+
+try{
+
+await addDoc(collection(db,"reservations"),{
+nom,
+telephone,
+prestation,
+date,
+heure,
+adresse,
+paiement,
+dateCreation:new Date().toISOString()
+});
+
+alert("Réservation enregistrée avec succès !");
+
+document.getElementById("nom").value="";
+document.getElementById("telephone").value="";
+document.getElementById("date").value="";
+document.getElementById("heure").value="";
+document.getElementById("adresse").value="";
+
+}catch(error){
+
+alert("Erreur : "+error.message);
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
