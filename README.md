@@ -1,1 +1,0 @@
-# HOME COIFFURE CI\nProjet de démarrage.
