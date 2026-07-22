@@ -1,0 +1,1 @@
+export const firebaseConfig={apiKey:"AIzaSyD0mZKfPFFscc1JYobyrBu4sVuwXmci79w",authDomain:"home-coiffure-ci.firebaseapp.com",projectId:"home-coiffure-ci",storageBucket:"home-coiffure-ci.firebasestorage.app",messagingSenderId:"674027032595",appId:"1:674027032595:web:909aba21b8d0d16882fe6"};
